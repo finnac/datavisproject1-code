@@ -43,6 +43,9 @@ d3.csv('data/national_health_data.csv')
         });
     });
 
+    // Set the default label for Category 2 (since pov % and this are going to be my baselines for testing)
+    document.getElementById('category2').value = 'education_less_than_high_school_percent';
+
     // Function to get the user-friendly label for each category
     function getCategoryLabel(category) {
       switch (category) {
