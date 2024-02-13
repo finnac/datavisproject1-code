@@ -37,12 +37,51 @@ d3.csv('data/national_health_data.csv')
     categories.forEach(category => {
         categoryDropdowns.forEach(dropdown => {
             const option = document.createElement('option');
-            option.text = category;
-            option.value = category;
+            option.text = getCategoryLabel(category); // Get the user-friendly label
+            option.value = category; // Set the actual category name as the value so we can use it later when actually processing data for vis
             dropdown.add(option);
         });
     });
 
+    // Function to get the user-friendly label for each category
+    function getCategoryLabel(category) {
+      switch (category) {
+          case 'poverty_perc':
+              return 'Poverty Percentage';
+          case 'median_household_income':
+              return 'Median Household Income';
+          case 'education_less_than_high_school_percent':
+              return 'Education Less Than High School Percentage';
+          case 'air_quality':
+              return 'Air Quality';
+          case 'park_access':
+              return 'Park Access';
+          case 'percent_inactive':
+              return 'Percent Inactive';
+          case 'percent_smoking':
+              return 'Percent Smoking';
+          case 'urban_rural_status':
+              return 'Urban/Rural Status';
+          case 'elderly_percentage':
+              return 'Elderly Percentage';
+          case 'number_of_hospitals':
+              return 'Number of Hospitals';
+          case 'number_of_primary_care_physicians':
+              return 'Number of Primary Care Physicians';
+          case 'percent_no_heath_insurance':
+              return 'Percent No Health Insurance';
+          case 'percent_high_blood_pressure':
+              return 'Percent High Blood Pressure';
+          case 'percent_coronary_heart_disease':
+              return 'Percent Coronary Heart Disease';
+          case 'percent_stroke':
+              return 'Percent Stroke';
+          case 'percent_high_cholesterol':
+              return 'Percent High Cholesterol';
+          default:
+              return category; // Use the category name as the label by default
+      }
+    }
     // Function to update visualization based on user selection
     function updateVisualization(category1, category2) {
       data.forEach(d => {
