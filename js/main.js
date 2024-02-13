@@ -4,18 +4,20 @@ import { renderChloropleth } from './chloropleth.js';
 // import { renderScatterplot } from './scatterplot.js';
 // // Import necessary functions from histogram.js
 // import { renderHistogram } from './histogram.js';
+import * as topojson from "./topojson-client.min.js";
 
 let loadedData; // Define a variable to store the loaded and processed data
+let usData; // Define a variable to store the US object data
 
 d3.csv('data/national_health_data.csv')
   .then(data => {
     console.log('Data loading complete.');
     //uncomment below line if you want it to log the data
     // console.log(data);
-
     //'urban_rural_status' is treated as a string field,
     //same with display_name
 
+    
 
     // Process the data
     data.forEach(d => {
@@ -103,7 +105,7 @@ d3.csv('data/national_health_data.csv')
               // renderScatterplot(loadedData, category1, category2);
               break;
           case 'chloropleth':
-              renderChloropleth(loadedData, category1, category2);
+              renderChloropleth(loadedData, usData, category1, category2);
               break;
           case 'histogram':
               // renderHistogram(loadedData, category1, category2);
