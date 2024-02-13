@@ -142,7 +142,7 @@ d3.csv('data/national_health_data.csv')
                 break;
             case 'chloropleth':
                 // Call function to render chloropleth
-                renderChloropleth(loadedData); // Pass loaded and processed data to the rendering function
+                renderChloropleth(loadedData, category1, category2); // Pass loaded and processed data to the rendering function
                 break;
             case 'histogram':
                 // Call function to render histogram

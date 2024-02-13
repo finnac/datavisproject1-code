@@ -1,3 +1,6 @@
+import { Legend } from "d3-color-legend";
+import { feature, mesh } from "topojson-client";
+
 // Function to get the user-friendly label for each category
 function getCategoryLabel(category) {
     switch (category) {
@@ -108,3 +111,5 @@ function getCategoryLabel(category) {
         // Return the SVG node
         return svg.node();
     }
+
+    
