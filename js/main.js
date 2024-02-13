@@ -1,3 +1,11 @@
+// Import necessary functions from chloropleth.js
+import { renderChloropleth } from './chloropleth.js';
+// // Import necessary functions from scatterplot.js
+// import { renderScatterplot } from './scatterplot.js';
+// // Import necessary functions from histogram.js
+// import { renderHistogram } from './histogram.js';
+
+
 d3.csv('data/national_health_data.csv')
   .then(data => {
     console.log('Data loading complete.');
@@ -11,7 +19,7 @@ d3.csv('data/national_health_data.csv')
     // Process the data
     data.forEach(d => {
       // Convert relevant fields to the appropriate data types
-      d.cnty_fips = +d.cnty_fips
+      // d.cnty_fips = +d.cnty_fips may need this not here because I think topojson doesn't want it typed as a number
       d.poverty_perc = +d.poverty_perc;
       d.median_household_income = +d.median_household_income;
       d.education_less_than_high_school_percent = +d.education_less_than_high_school_percent;
@@ -86,11 +94,22 @@ d3.csv('data/national_health_data.csv')
       }
     }
     // Function to update visualization based on user selection
-    function updateVisualization(category1, category2) {
-      data.forEach(d => {
-        console.log(`County FIPS: ${d.cnty_fips}, Display Name: ${d.display_name}, Urban/Rural Status: ${d.urban_rural_status}, ${category1}: ${d[category1]}, ${category2}: ${d[category2]}`);
-        // You can perform further visualization logic here
-      });
+    function updateVisualization(data, category1, category2, vizType) {
+      // Check the selected visualization type and call the respective rendering function
+      switch (vizType) {
+          case 'scatterplot':
+              renderScatterplot(data, category1, category2);
+              break;
+          case 'chloropleth':
+              renderChloropleth(data, category1, category2);
+              break;
+          case 'histogram':
+              renderHistogram(data, category1, category2);
+              break;
+          default:
+              console.log('Invalid visualization type selected.');
+              break;
+      }
     }
 
     // Event listeners for dropdown menus
@@ -110,8 +129,25 @@ d3.csv('data/national_health_data.csv')
     document.getElementById('vizType').addEventListener('change', function() {
         let vizType = this.value;
         console.log(`Selected Visualization Type: ${vizType}`);
+        
         // Call the respective function based on the selected visualization type
-        // Example: if (vizType === 'chloropleth') renderChloropleth();
+        switch (vizType) {
+            case 'scatterplot':
+                // Call function to render scatterplot
+                // renderScatterplot();
+                break;
+            case 'chloropleth':
+                // Call function to render chloropleth
+                renderChloropleth();
+                break;
+            case 'histogram':
+                // Call function to render histogram
+                // renderHistogram();
+                break;
+            default:
+                console.log('Invalid visualization type selected.');
+                break;
+        }
     });
   })
   .catch(error => {
