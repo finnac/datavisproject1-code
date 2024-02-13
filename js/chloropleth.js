@@ -42,12 +42,14 @@ function getCategoryLabel(category) {
         // Define the color scales for the chloropleth maps
         const colorSchemes = {
             category1: d3.scaleQuantize().range(d3.schemeBlues[9]),
-            category2: d3.scaleQuantize().range(d3.schemeGreens[9])
+            category2: d3.scaleQuantize().range(d3.schemeGreens[9]),
+            urbanRuralStatus: d3.scaleOrdinal().range(["#f00", "#0f0", "#00f"]) // Example colors for urban, rural, and other
         };
     
-        // Extract data for category 1 and category 2
+        // Extract data for category 1, category 2, and urban rural status
         const category1DataMap = new Map(data.map(d => [d.cnty_fips, d[category1]]));
         const category2DataMap = new Map(data.map(d => [d.cnty_fips, d[category2]]));
+        const urbanRuralStatusMap = new Map(data.map(d => [d.cnty_fips, d.urban_rural_status]));
     
         // Create the SVG container
         const svg = d3.create("svg")
@@ -67,7 +69,10 @@ function getCategoryLabel(category) {
             .selectAll("path")
             .data(topojson.feature(data.us, data.us.objects.counties).features)
             .join("path")
-                .attr("fill", d => colorSchemes.category1(category1DataMap.get(d.id)))
+                .attr("fill", d => {
+                    const value = category1DataMap.get(d.id);
+                    return isNaN(value) ? colorSchemes.urbanRuralStatus(value) : colorSchemes.category1(value);
+                })
                 .attr("d", d3.geoPath())
             .append("title")
                 .text(d => `${getCategoryLabel(category1)} - ${d.properties.name}, ${data.statemap.get(d.id.slice(0, 2)).properties.name}\n${category1DataMap.get(d.id)}%`);
@@ -83,7 +88,10 @@ function getCategoryLabel(category) {
             .selectAll("path")
             .data(topojson.feature(data.us, data.us.objects.counties).features)
             .join("path")
-                .attr("fill", d => colorSchemes.category2(category2DataMap.get(d.id)))
+                .attr("fill", d => {
+                    const value = category2DataMap.get(d.id);
+                    return isNaN(value) ? colorSchemes.urbanRuralStatus(value) : colorSchemes.category2(value);
+                })
                 .attr("d", d3.geoPath())
             .append("title")
                 .text(d => `${getCategoryLabel(category2)} - ${d.properties.name}, ${data.statemap.get(d.id.slice(0, 2)).properties.name}\n${category2DataMap.get(d.id)}%`);
