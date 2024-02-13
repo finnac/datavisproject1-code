@@ -1,9 +1,42 @@
+// Function to get the user-friendly label for each category
 function getCategoryLabel(category) {
-    // Logic to get the user-friendly label for each category
-    // You can customize this based on your specific requirements
-    // For example, you might want to map category names to user-friendly labels
-    return category; // Default to category name as label
-}
+    switch (category) {
+        case 'poverty_perc':
+            return 'Poverty Percentage';
+        case 'median_household_income':
+            return 'Median Household Income';
+        case 'education_less_than_high_school_percent':
+            return 'Education Less Than High School Percentage';
+        case 'air_quality':
+            return 'Air Quality';
+        case 'park_access':
+            return 'Park Access';
+        case 'percent_inactive':
+            return 'Percent Inactive';
+        case 'percent_smoking':
+            return 'Percent Smoking';
+        case 'urban_rural_status':
+            return 'Urban/Rural Status';
+        case 'elderly_percentage':
+            return 'Elderly Percentage';
+        case 'number_of_hospitals':
+            return 'Number of Hospitals';
+        case 'number_of_primary_care_physicians':
+            return 'Number of Primary Care Physicians';
+        case 'percent_no_heath_insurance':
+            return 'Percent No Health Insurance';
+        case 'percent_high_blood_pressure':
+            return 'Percent High Blood Pressure';
+        case 'percent_coronary_heart_disease':
+            return 'Percent Coronary Heart Disease';
+        case 'percent_stroke':
+            return 'Percent Stroke';
+        case 'percent_high_cholesterol':
+            return 'Percent High Cholesterol';
+        default:
+            return category; // Use the category name as the label by default
+      }
+    }
 
 export function renderChloropleth(data, category1, category2) {
     // Define the color scales for the chloropleth maps
@@ -13,8 +46,8 @@ export function renderChloropleth(data, category1, category2) {
     };
 
     // Extract data for category 1 and category 2
-    const category1DataMap = new Map(data.map(d => [d.id, d[category1]]));
-    const category2DataMap = new Map(data.map(d => [d.id, d[category2]]));
+    const category1DataMap = new Map(data.map(d => [d.cnty_fips, d[category1]]));
+    const category2DataMap = new Map(data.map(d => [d.cnty_fips, d[category2]]));
 
     // Create the SVG container
     const svg = d3.create("svg")
@@ -67,4 +100,3 @@ export function renderChloropleth(data, category1, category2) {
     // Return the SVG node
     return svg.node();
 }
-
