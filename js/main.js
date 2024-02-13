@@ -5,6 +5,7 @@ import { renderChloropleth } from './chloropleth.js';
 // // Import necessary functions from histogram.js
 // import { renderHistogram } from './histogram.js';
 
+let loadedData; // Define a variable to store the loaded and processed data
 
 d3.csv('data/national_health_data.csv')
   .then(data => {
@@ -15,7 +16,7 @@ d3.csv('data/national_health_data.csv')
     //'urban_rural_status' is treated as a string field,
     //same with display_name
 
-  
+
     // Process the data
     data.forEach(d => {
       // Convert relevant fields to the appropriate data types
@@ -37,18 +38,19 @@ d3.csv('data/national_health_data.csv')
       d.percent_high_cholesterol = +d.percent_high_cholesterol;
     });
 
-    // Extract all data categories except 'cnty_fips' and 'display_name', since we don't want those selectable
-    const categories = Object.keys(data[0]).filter(key => key !== 'cnty_fips' && key !== 'display_name');
+    loadedData = data; // Store the processed data in the variable
 
     // Populate dropdown menus with data categories
     const categoryDropdowns = document.querySelectorAll('#category1, #category2');
-    categories.forEach(category => {
-        categoryDropdowns.forEach(dropdown => {
-            const option = document.createElement('option');
-            option.text = getCategoryLabel(category); // Get the user-friendly label
-            option.value = category; // Set the actual category name as the value so we can use it later when actually processing data for vis
-            dropdown.add(option);
-        });
+    Object.keys(data[0]).forEach(category => {
+        if (category !== 'cnty_fips' && category !== 'display_name') {
+            categoryDropdowns.forEach(dropdown => {
+                const option = document.createElement('option');
+                option.text = getCategoryLabel(category); // Get the user-friendly label
+                option.value = category; // Set the actual category name as the value so we can use it later when actually processing data for vis
+                dropdown.add(option);
+            });
+        }
     });
 
     // Set the default label for Category 2 (since pov % and this are going to be my baselines for testing)
@@ -94,17 +96,17 @@ d3.csv('data/national_health_data.csv')
       }
     }
     // Function to update visualization based on user selection
-    function updateVisualization(data, category1, category2, vizType) {
+    function updateVisualization(category1, category2, vizType) {
       // Check the selected visualization type and call the respective rendering function
       switch (vizType) {
           case 'scatterplot':
-              renderScatterplot(data, category1, category2);
+              // renderScatterplot(loadedData, category1, category2);
               break;
           case 'chloropleth':
-              renderChloropleth(data, category1, category2);
+              renderChloropleth(loadedData, category1, category2);
               break;
           case 'histogram':
-              renderHistogram(data, category1, category2);
+              // renderHistogram(loadedData, category1, category2);
               break;
           default:
               console.log('Invalid visualization type selected.');
@@ -116,13 +118,15 @@ d3.csv('data/national_health_data.csv')
     document.getElementById('category1').addEventListener('change', function() {
         let category1 = this.value;
         let category2 = document.getElementById('category2').value;
-        updateVisualization(category1, category2);
+        let vizType = document.getElementById('vizType').value;
+        updateVisualization(category1, category2, vizType);
     });
 
     document.getElementById('category2').addEventListener('change', function() {
         let category1 = document.getElementById('category1').value;
         let category2 = this.value;
-        updateVisualization(category1, category2);
+        let vizType = document.getElementById('vizType').value;
+        updateVisualization(category1, category2, vizType);
     });
 
     // Event listener for visualization type dropdown
@@ -138,7 +142,7 @@ d3.csv('data/national_health_data.csv')
                 break;
             case 'chloropleth':
                 // Call function to render chloropleth
-                renderChloropleth();
+                renderChloropleth(loadedData); // Pass loaded and processed data to the rendering function
                 break;
             case 'histogram':
                 // Call function to render histogram

@@ -44,10 +44,17 @@
     <!-- D3 bundle -->
     <script src="js/d3.v7.min.js"></script>
 
+    <script src="https://unpkg.com/topojson@3"></script>
+    <script>
+    
+    var topology = topojson.topology({foo: geojson});
+    
+    </script> 
+
     <!-- Our JS code - INCLUDING the new files-->
-    <script src="js/main.js"></script>
-    <!-- <script src="js/line.js"></script>  
-    <script src="js/timelineCircles.js"></script>  -->
+    <script src="js/main.js" type="module"></script>
+    <script src="js/chloropleth.js" type="module"></script>  
+    <!-- <script src="js/timelineCircles.js"></script>  --> 
 
 
 </body>
