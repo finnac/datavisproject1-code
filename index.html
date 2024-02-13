@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>D3 Project 1 Ashley Finn</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:;base64,iVBORwOKGO=" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body> 
+    <!-- Dropdown menus for category and visualization type selection -->
+    <div id="selectionContainer">
+        <!-- Visualization type dropdown -->
+        <label for="vizType">Select Visualization Type:</label>
+        <select id="vizType">
+            <option value="chloropleth">Chloropleth</option>
+            <option value="histogram">Histogram</option>
+            <option value="scatterplot">Scatterplot</option>
+        </select>
+
+        <!-- Category selection dropdowns -->
+        <label for="category1">Select Category 1:</label>
+        <select id="category1">
+            <!-- Options will be dynamically added using JavaScript -->
+        </select>
+        <label for="category2">Select Category 2:</label>
+        <select id="category2">
+            <!-- Options will be dynamically added using JavaScript -->
+        </select>
+    </div>
+
+
+
+    <!-- Visualization area where the plots will be rendered -->
+    <div id="visualization">
+        <!-- Plots will be rendered here -->
+    </div>
+
+
+
+
+    <!-- D3 bundle -->
+    <script src="js/d3.v7.min.js"></script>
+
+    <!-- Our JS code - INCLUDING the new files-->
+    <script src="js/main.js"></script>
+    <!-- <script src="js/line.js"></script>  
+    <script src="js/timelineCircles.js"></script>  -->
+
+
+</body>
+</html>
