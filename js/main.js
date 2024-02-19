@@ -1,13 +1,16 @@
-// Import necessary functions from chloropleth.js
-import { renderChloropleth } from './chloropleth.js';
+
+// import { renderChloropleth } from './chloropleth.js';
 // // Import necessary functions from scatterplot.js
 // import { renderScatterplot } from './scatterplot.js';
 // // Import necessary functions from histogram.js
 // import { renderHistogram } from './histogram.js';
+
 import * as topojson from "./topojson-client.min.js";
 
 let loadedData; // Define a variable to store the loaded and processed data
 let usData; // Define a variable to store the US object data
+let chloropleth1Data;
+let chloropleth2Data;
 
 d3.csv('data/national_health_data.csv')
   .then(data => {
@@ -97,6 +100,62 @@ d3.csv('data/national_health_data.csv')
               return category; // Use the category name as the label by default
       }
     }
+
+    function processDataForChoropleth(category) {
+        return Promise.all([
+            d3.json('data/counties-10m.json'),
+            d3.csv('data/national_health_data.csv')
+        ]).then(data => {
+            const geoData = data[0];
+            const healthData = data[1];
+    
+            // Combine both datasets by adding the category's data to the GeoJSON file
+            geoData.objects.counties.geometries.forEach(d => {
+                // Find the corresponding entry in the health data
+                const healthEntry = healthData.find(entry => entry.cnty_fips === d.id);
+    
+                // If a matching entry is found, add the category's data along with cnty_fips and display_name
+                if (healthEntry) {
+                    // Convert relevant fields to the appropriate data types based on the category
+                    switch (category) {
+                        case 'poverty_perc':
+                        case 'median_household_income':
+                        case 'education_less_than_high_school_percent':
+                        case 'air_quality':
+                        case 'park_access':
+                        case 'percent_inactive':
+                        case 'percent_smoking':
+                        case 'elderly_percentage':
+                        case 'number_of_hospitals':
+                        case 'number_of_primary_care_physicians':
+                        case 'percent_no_heath_insurance':
+                        case 'percent_high_blood_pressure':
+                        case 'percent_coronary_heart_disease':
+                        case 'percent_stroke':
+                        case 'percent_high_cholesterol':
+                            // Convert numerical fields to numbers
+                            d.properties[category] = +healthEntry[category];
+                            break;
+                        default:
+                            // For categorical fields, keep them as strings
+                            // Add any additional processing logic as needed
+                            d.properties[category] = healthEntry[category];
+                            break;
+                    }
+    
+                    // Add cnty_fips and display_name to the GeoJSON properties
+                    d.properties.cnty_fips = healthEntry.cnty_fips;
+                    d.properties.display_name = healthEntry.display_name;
+                }
+            });
+    
+            // Return the combined dataset
+            return geoData;
+        }).catch(error => {
+            console.error('Error loading the data:', error);
+        });
+    }
+
     // Function to update visualization based on user selection
     function updateVisualization(category1, category2, vizType) {
       // Check the selected visualization type and call the respective rendering function
@@ -104,9 +163,31 @@ d3.csv('data/national_health_data.csv')
           case 'scatterplot':
               // renderScatterplot(loadedData, category1, category2);
               break;
-          case 'chloropleth':
-              renderChloropleth(loadedData, usData, category1, category2);
-              break;
+         case 'chloropleth':
+            // Clear the parent elements first
+            document.getElementById('map1').innerHTML = '';
+            document.getElementById('map2').innerHTML = '';
+
+            // Process data for the first choropleth
+            processDataForChoropleth(category1).then(chloropleth1Data => {
+                const choroplethMap1 = new ChoroplethMap('.map1', category1, chloropleth1Data, {
+                    containerWidth: 500,
+                    containerHeight: 500,
+                    margin: {top: 10, right: 10, bottom: 10, left: 10}
+                });
+            });
+
+            // Process data for the second choropleth
+            processDataForChoropleth(category2).then(chloropleth2Data => {
+                const choroplethMap2 = new ChoroplethMap('.map2', category2, chloropleth2Data, {
+                    containerWidth: 500,
+                    containerHeight: 500,
+                    margin: {top: 10, right: 10, bottom: 10, left: 10}
+                });
+            });
+
+            
+            break;
           case 'histogram':
               // renderHistogram(loadedData, category1, category2);
               break;
@@ -143,8 +224,8 @@ d3.csv('data/national_health_data.csv')
                 // renderScatterplot();
                 break;
             case 'chloropleth':
-                // Call function to render chloropleth
-                renderChloropleth(loadedData, category1, category2); // Pass loaded and processed data to the rendering function
+                // Call updatevizfunction to render chloropleth
+                updateVisualization(category1, category2, vizType);
                 break;
             case 'histogram':
                 // Call function to render histogram
@@ -160,29 +241,4 @@ d3.csv('data/national_health_data.csv')
     console.error('Error loading the data');
   });
 
-
-// Plot.plot({
-//   width: 975,
-//   height: 610,
-//   projection: "identity",
-//   color: {
-//     type: "quantize",
-//     n: 9,
-//     domain: [1, 10],
-//     scheme: "blues",
-//     label: "Unemployment rate (%)",
-//     legend: true
-//   },
-//   marks: [
-//     Plot.geo(counties, Plot.centroid({
-//       fill: d => unemployment.get(d.id),
-//       tip: true,
-//       channels: {
-//         County: d => d.properties.name,
-//         State: d => statemap.get(d.id.slice(0,2)).properties.name
-//       }
-//     })),
-//     Plot.geo(states, {stroke: "white"})
-//   ]
-// })
 
