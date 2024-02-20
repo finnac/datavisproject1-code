@@ -171,8 +171,8 @@ d3.csv('data/national_health_data.csv')
             // Process data for the first choropleth
             processDataForChoropleth(category1).then(chloropleth1Data => {
                 const choroplethMap1 = new ChoroplethMap('.map1', category1, chloropleth1Data, {
-                    containerWidth: 500,
-                    containerHeight: 500,
+                    containerWidth: 600,
+                    containerHeight: 600,
                     margin: {top: 10, right: 10, bottom: 10, left: 10}
                 });
             });
@@ -180,8 +180,8 @@ d3.csv('data/national_health_data.csv')
             // Process data for the second choropleth
             processDataForChoropleth(category2).then(chloropleth2Data => {
                 const choroplethMap2 = new ChoroplethMap('.map2', category2, chloropleth2Data, {
-                    containerWidth: 500,
-                    containerHeight: 500,
+                    containerWidth: 600,
+                    containerHeight: 600,
                     margin: {top: 10, right: 10, bottom: 10, left: 10}
                 });
             });

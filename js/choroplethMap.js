@@ -5,8 +5,8 @@ class ChoroplethMap {
       this.data = data;
 
       this.config = {
-          containerWidth: config.containerWidth || 500,
-          containerHeight: config.containerHeight || 500,
+          containerWidth: config.containerWidth || 600,
+          containerHeight: config.containerHeight || 600,
           margin: config.margin || {top: 10, right: 10, bottom: 10, left: 10},
           tooltipPadding: config.tooltipPadding || 10,
           legendBottom: config.legendBottom || 50,
