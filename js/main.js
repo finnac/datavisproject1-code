@@ -186,6 +186,8 @@ d3.csv('data/national_health_data.csv')
                 });
             });
 
+            document.getElementById('map1-label').textContent = getCategoryLabel(category1);
+            document.getElementById('map2-label').textContent = getCategoryLabel(category2);
             
             break;
           case 'histogram':

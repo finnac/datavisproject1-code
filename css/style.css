@@ -98,3 +98,23 @@ font-weight: 600;
     padding: 10px; /* Add padding for better spacing */
     border: 1px solid #ccc; /* Add border for visualization separation */
 }
+
+#visualization {
+    display: flex; /* Use flexbox */
+    justify-content: flex-start;
+}
+
+.map1, .map2 {
+    flex: 1; /* Each map takes equal space */
+    margin-right: 10px; /* Optional: Add some margin between maps */
+}
+
+.map-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+}
+
+.map-label {
+    margin-bottom: 10px; /* Adjust spacing between label and map */
+}

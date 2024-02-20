@@ -33,12 +33,23 @@
     <!-- Visualization area where the plots will be rendered -->
     <div id="visualization">
         <svg height="5" width="5" xmlns="http://www.w3.org/2000/svg" version="1.1"> <defs> <pattern id="lightstripe" patternUnits="userSpaceOnUse" width="5" height="5"> <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc1JyBoZWlnaHQ9JzUnPgogIDxyZWN0IHdpZHRoPSc1JyBoZWlnaHQ9JzUnIGZpbGw9J3doaXRlJy8+CiAgPHBhdGggZD0nTTAgNUw1IDBaTTYgNEw0IDZaTS0xIDFMMSAtMVonIHN0cm9rZT0nIzg4OCcgc3Ryb2tlLXdpZHRoPScxJy8+Cjwvc3ZnPg==" x="0" y="0" width="5" height="5"> </image> </pattern> </defs></svg>
-        <!-- put map1 and map 2 here horizontally next to each other -->
+        
+      <!-- Map 1 -->
+    <div class="map-group">
+        <!-- Map 1 label -->
+        <div id="map1-label" class="map-label"></div>
+        <!-- Map 1 -->
         <div id="map1" class="map1"></div>
-        <div id="map2" class="map2"></div>
     </div>
 
-
+    <!-- Map 2 -->
+    <div class="map-group">
+        <!-- Map 2 label -->
+        <div id="map2-label" class="map-label"></div>
+        <!-- Map 2 -->
+        <div id="map2" class="map2"></div>
+    </div>
+</div>
 
 
     <!-- D3 bundle -->
