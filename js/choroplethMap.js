@@ -75,17 +75,26 @@ class ChoroplethMap {
               }
           });
 
-      vis.counties
-          .on('mousemove', (d,event) => {
-              const categoryValue = d.properties[vis.category] !== -1 ? `<strong>${d.properties[vis.category]}</strong>` : 'No data available'; 
+          vis.counties
+          .on('mousemove', (d, event) => {
+              console.log('Data object:', d); // Log the data object
+              console.log('Category:', vis.category); // Log the category being accessed
+      
+              // Check if properties and name exist before accessing
+              const categoryValue = d.properties && d.properties[vis.category] !== undefined && d.properties[vis.category] !== -1 
+                  ? `<strong>${d.properties[vis.category]}</strong>` 
+                  : 'No data available';
+      
+              const tooltipContent = `
+                  <div class="tooltip-title">${d.properties && d.properties.name ? d.properties.name : 'Unknown'}</div>
+                  <div>${categoryValue}</div>
+              `;
+      
               d3.select('#tooltip')
                   .style('display', 'block')
                   .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
                   .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-                  .html(`
-                      <div class="tooltip-title">${d.properties.name}</div>
-                      <div>${categoryValue}</div>
-                  `);
+                  .html(tooltipContent);
           })
           .on('mouseleave', () => {
               d3.select('#tooltip').style('display', 'none');
