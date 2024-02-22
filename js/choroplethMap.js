@@ -1,3 +1,43 @@
+ // Function to get the user-friendly label for each category
+ function getCategoryLabel(category) {
+    switch (category) {
+        case 'poverty_perc':
+            return 'Poverty Percentage';
+        case 'median_household_income':
+            return 'Median Household Income';
+        case 'education_less_than_high_school_percent':
+            return 'Education Less Than High School Percentage';
+        case 'air_quality':
+            return 'Air Quality';
+        case 'park_access':
+            return 'Park Access';
+        case 'percent_inactive':
+            return 'Percent Inactive';
+        case 'percent_smoking':
+            return 'Percent Smoking';
+        case 'urban_rural_status':
+            return 'Urban/Rural Status';
+        case 'elderly_percentage':
+            return 'Elderly Percentage';
+        case 'number_of_hospitals':
+            return 'Number of Hospitals';
+        case 'number_of_primary_care_physicians':
+            return 'Number of Primary Care Physicians';
+        case 'percent_no_heath_insurance':
+            return 'Percent No Health Insurance';
+        case 'percent_high_blood_pressure':
+            return 'Percent High Blood Pressure';
+        case 'percent_coronary_heart_disease':
+            return 'Percent Coronary Heart Disease';
+        case 'percent_stroke':
+            return 'Percent Stroke';
+        case 'percent_high_cholesterol':
+            return 'Percent High Cholesterol';
+        default:
+            return category; // Use the category name as the label by default
+    }
+  }
+  
 class ChoroplethMap {
   constructor(parentElement, category, data, config) {
       this.parentElement = parentElement;
@@ -77,28 +117,26 @@ class ChoroplethMap {
 
           vis.counties
           .on('mousemove', (d, event) => {
-              console.log('Data object:', d); // Log the data object
-              console.log('Category:', vis.category); // Log the category being accessed
-      
-              // Check if properties and name exist before accessing
-              const categoryValue = d.properties && d.properties[vis.category] !== undefined && d.properties[vis.category] !== -1 
-                  ? `<strong>${d.properties[vis.category]}</strong>` 
-                  : 'No data available';
-      
-              const tooltipContent = `
-                  <div class="tooltip-title">${d.properties && d.properties.name ? d.properties.name : 'Unknown'}</div>
-                  <div>${categoryValue}</div>
-              `;
-      
-              d3.select('#tooltip')
-                  .style('display', 'block')
-                  .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
-                  .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-                  .html(tooltipContent);
-          })
-          .on('mouseleave', () => {
-              d3.select('#tooltip').style('display', 'none');
-          });
+            console.log('Data object:', d); // Log the data object
+            console.log('Category:', vis.category); // Log the category being accessed
+        
+            // Check if properties and name exist before accessing
+            const categoryValue = d.properties && d.properties[vis.category] !== undefined && d.properties[vis.category] !== -1
+                ? `<strong>${d.properties[vis.category]}</strong>`
+                : 'No data available';
+        
+            const tooltipContent = `
+                <div class="tooltip-title">${getCategoryLabel(vis.category)}</div>
+                <div><strong>County:</strong> ${d.properties && d.properties.display_name ? d.properties.display_name : 'Unknown'}</div>
+                <div><strong>${getCategoryLabel(vis.category)}:</strong> ${categoryValue}</div>
+            `;
+        
+            const tooltip = document.getElementById('tooltip');
+            tooltip.innerHTML = tooltipContent;
+            tooltip.style.display = 'block';
+            tooltip.style.left = (event.pageX + vis.config.tooltipPadding) + 'px';
+            tooltip.style.top = (event.pageY + vis.config.tooltipPadding) + 'px';
+        })
 
       vis.g.append("path")
           .datum(topojson.mesh(vis.us, vis.us.objects.states, function(a, b) { return a !== b; }))
