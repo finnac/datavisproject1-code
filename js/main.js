@@ -146,6 +146,9 @@ d3.csv('data/national_health_data.csv')
                     // Add cnty_fips and display_name to the GeoJSON properties
                     d.properties.cnty_fips = healthEntry.cnty_fips;
                     d.properties.display_name = healthEntry.display_name;
+                    
+                    // Store the category data under a key named categoryData
+                    d.properties.categoryData = healthEntry[category];
                 }
             });
     

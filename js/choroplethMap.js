@@ -44,6 +44,8 @@ class ChoroplethMap {
       this.category = category;
       this.data = data;
 
+      console.log('Data fed into choropleth map:', data);
+
       this.config = {
           containerWidth: config.containerWidth || 600,
           containerHeight: config.containerHeight || 600,
@@ -115,28 +117,33 @@ class ChoroplethMap {
               }
           });
 
+          console.log('Data in counties:', vis.counties.data()); // Log data associated with counties
+          
           vis.counties
-          .on('mousemove', (d, event) => {
-            console.log('Data object:', d); // Log the data object
-            console.log('Category:', vis.category); // Log the category being accessed
-        
-            // Check if properties and name exist before accessing
-            const categoryValue = d.properties && d.properties[vis.category] !== undefined && d.properties[vis.category] !== -1
-                ? `<strong>${d.properties[vis.category]}</strong>`
-                : 'No data available';
-        
-            const tooltipContent = `
-                <div class="tooltip-title">${getCategoryLabel(vis.category)}</div>
-                <div><strong>County:</strong> ${d.properties && d.properties.display_name ? d.properties.display_name : 'Unknown'}</div>
-                <div><strong>${getCategoryLabel(vis.category)}:</strong> ${categoryValue}</div>
-            `;
-        
-            const tooltip = document.getElementById('tooltip');
-            tooltip.innerHTML = tooltipContent;
-            tooltip.style.display = 'block';
-            tooltip.style.left = (event.pageX + vis.config.tooltipPadding) + 'px';
-            tooltip.style.top = (event.pageY + vis.config.tooltipPadding) + 'px';
-        })
+          .on('mousemove', (event, d) => {
+              console.log('Data object:', d); // Log the data object
+              console.log('Category:', vis.category); // Log the category being accessed
+      
+              // Check if properties and name exist before accessing
+              const categoryValue = d.properties && d.properties[vis.category] !== undefined && d.properties[vis.category] !== -1
+                  ? `<strong>${d.properties[vis.category]}</strong>`
+                  : 'No data available';
+      
+              const displayName = d.properties && d.properties.display_name ? d.properties.display_name : 'Unknown';
+      
+              const tooltipContent = `
+                  <div class="tooltip-title">${getCategoryLabel(vis.category)}</div>
+                  <div><strong>County:</strong> ${displayName}</div>
+                  <div><strong>${getCategoryLabel(vis.category)}:</strong> ${categoryValue}</div>
+              `;
+      
+              const tooltip = document.getElementById('tooltip');
+              tooltip.innerHTML = tooltipContent;
+              tooltip.style.display = 'block';
+              tooltip.style.left = (event.pageX + vis.config.tooltipPadding) + 'px';
+              tooltip.style.top = (event.pageY + vis.config.tooltipPadding) + 'px';
+          });
+      
 
       vis.g.append("path")
           .datum(topojson.mesh(vis.us, vis.us.objects.states, function(a, b) { return a !== b; }))
