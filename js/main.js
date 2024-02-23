@@ -256,7 +256,7 @@ function processDataForCharts(category) {
                 processDataForCharts(category1).then(data => {
                     histogram1Data = data;
                     // Create an instance of Histogram for the first histogram
-                    const histogram1 = new Histogram('.map1', histogram1Data, {
+                    const histogram1 = new Histogram('.map1', category1, histogram1Data, {
                         containerWidth: 600,
                         containerHeight: 600,
                         margin: {top: 10, right: 10, bottom: 10, left: 10}
@@ -267,7 +267,7 @@ function processDataForCharts(category) {
                 processDataForCharts(category2).then(data => {
                     histogram2Data = data;
                     // Create an instance of Histogram for the second histogram
-                    const histogram2 = new Histogram('.map2', histogram2Data, {
+                    const histogram2 = new Histogram('.map2', category2, histogram2Data, {
                         containerWidth: 600,
                         containerHeight: 600,
                         margin: {top: 10, right: 10, bottom: 10, left: 10}

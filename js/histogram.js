@@ -39,10 +39,11 @@ function getCategoryLabel(category) {
   }
 
 class Histogram {
-    constructor(parentElement, data, config) {
+    constructor(parentElement, category, data, config) {
         this.parentElement = parentElement;
         this.data = data;
         this.config = config;
+        this.category = category; // Store the category for labeling
 
         // Log data for debugging purposes
         console.log('Data fed into histogram:', data);
@@ -69,32 +70,44 @@ class Histogram {
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight);
 
-        // Create a group for the bars
-        vis.barGroup = vis.svg.append('g')
-            .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
+         // Create a group for the bars
+         vis.barGroup = vis.svg.append('g')
+         .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
 
         // Define scales based on data types
-        if (vis.data.every(d => typeof d === 'number')) {
+        if (vis.data.every(d => typeof d.categoryData === 'number')) {
             // For numerical data
             vis.xScale = d3.scaleLinear()
-                .domain([0, d3.max(vis.data)])
+                .domain([0, d3.max(vis.data, d => d.categoryData)])
                 .range([0, vis.width]);
         } else {
             // For categorical data
             vis.xScale = d3.scaleBand()
-                .domain(vis.data.map(d => d.toString()))
+                .domain(vis.data.map(d => d.countyName))
                 .range([0, vis.width])
                 .padding(0.1);
         }
 
+        // Calculate the width of the bars
+        vis.barWidth = vis.xScale.bandwidth ? vis.xScale.bandwidth() : vis.width / vis.data.length;
+
+
         // Create x-axis
         vis.xAxis = d3.axisBottom(vis.xScale);
 
-        // Append x-axis to SVG
+     // Append x-axis to SVG
         vis.svg.append('g')
-            .attr('class', 'x-axis')
-            .attr('transform', `translate(${vis.config.margin.left},${vis.height + vis.config.margin.top})`)
-            .call(vis.xAxis);
+        .attr('class', 'x-axis')
+        .attr('transform', `translate(${vis.config.margin.left}, ${vis.height + vis.config.margin.top - 20})`)
+        .call(vis.xAxis);
+                
+
+        // Label the x-axis
+        vis.svg.append('text')
+            .attr('class', 'x-axis-label')
+            .attr('transform', `translate(${vis.width / 2},${vis.height + vis.config.margin.top + 30})`)
+            .style('text-anchor', 'middle')
+            .text(vis.category); // Use the category for labeling
 
         // Log successful initialization
         console.log('Histogram initialized successfully.');
@@ -111,14 +124,14 @@ class Histogram {
             .data(vis.data)
             .enter().append('rect')
             .attr('class', 'bar')
-            .attr('x', (d, i) => vis.xScale(d.toString()))
+            .attr('x', (d, i) => vis.xScale(d.countyName))
             .attr('y', d => vis.height - vis.config.margin.bottom - vis.config.margin.top)
-            .attr('width', vis.xScale.bandwidth())
+            .attr('width', vis.barWidth)
             .attr('height', 0)
             .transition()
             .duration(1000)
-            .attr('y', d => vis.height - vis.config.margin.bottom - vis.config.margin.top - (d * vis.height))
-            .attr('height', d => d * vis.height)
+            .attr('y', d => vis.height - vis.config.margin.bottom - vis.config.margin.top - (d.categoryData * vis.height))
+            .attr('height', d => d.categoryData * vis.height)
             .attr('fill', 'steelblue');
     }
 }
