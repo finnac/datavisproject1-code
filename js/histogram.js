@@ -118,20 +118,21 @@ class Histogram {
 
     renderBars() {
         let vis = this;
-
+    
         // Render bars based on data
         vis.barGroup.selectAll('.bar')
             .data(vis.data)
-            .enter().append('rect')
+            .enter()
+            .append('rect')
             .attr('class', 'bar')
             .attr('x', (d, i) => vis.xScale(d.countyName))
-            .attr('y', d => vis.height - vis.config.margin.bottom - vis.config.margin.top)
+            .attr('y', d => vis.height - vis.config.margin.bottom) // Start the bars at the bottom of the SVG container
             .attr('width', vis.barWidth)
             .attr('height', 0)
             .transition()
             .duration(1000)
-            .attr('y', d => vis.height - vis.config.margin.bottom - vis.config.margin.top - (d.categoryData * vis.height))
-            .attr('height', d => d.categoryData * vis.height)
+            .attr('y', d => vis.height - vis.config.margin.bottom - (d.categoryData * vis.height)) // Move the bars upwards based on data
+            .attr('height', d => Math.abs(d.categoryData * vis.height)) // Ensure the height is positive
             .attr('fill', 'steelblue');
     }
 }
