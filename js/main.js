@@ -11,6 +11,12 @@ let loadedData; // Define a variable to store the loaded and processed data
 let usData; // Define a variable to store the US object data
 let chloropleth1Data;
 let chloropleth2Data;
+let histogram1Data;
+let histogram2Data;
+let category1 = 'poverty_perc'; // Default value for category1
+let category2 = 'education_less_than_high_school_percent'; // Default value for category2
+
+
 
 d3.csv('data/national_health_data.csv')
   .then(data => {
@@ -159,6 +165,53 @@ d3.csv('data/national_health_data.csv')
         });
     }
 
+function processDataForCharts(category) {
+    return d3.csv('data/national_health_data.csv').then(data => {
+        let histogramData = []; // Initialize an array to store processed data for the histogram
+        
+        // Process the data to extract relevant attributes for histograms
+        data.forEach(d => {
+            // Convert relevant fields to the appropriate data types based on the category
+            switch (category) {
+                case 'poverty_perc':
+                case 'median_household_income':
+                case 'education_less_than_high_school_percent':
+                case 'air_quality':
+                case 'park_access':
+                case 'percent_inactive':
+                case 'percent_smoking':
+                case 'elderly_percentage':
+                case 'number_of_hospitals':
+                case 'number_of_primary_care_physicians':
+                case 'percent_no_heath_insurance':
+                case 'percent_high_blood_pressure':
+                case 'percent_coronary_heart_disease':
+                case 'percent_stroke':
+                case 'percent_high_cholesterol':
+                    // Convert numerical fields to numbers
+                    d[category] = +d[category];
+                    break;
+                default:
+                    // For categorical fields, keep them as strings
+                    // Add any additional processing logic as needed
+                    break;
+            }
+
+            // Create an object containing relevant data for the histogram
+            let histogramDatum = {
+                categoryData: d[category], // Store the category data
+                countyName: d.display_name, // Store the county name
+                countyFIPS: d.cnty_fips // Store the county FIPS code
+            };
+
+            // Push the processed data object to the array
+            histogramData.push(histogramDatum);
+        });
+
+        return histogramData; // Return the processed data for the histogram
+    });
+}
+
     // Function to update visualization based on user selection
     function updateVisualization(category1, category2, vizType) {
       // Check the selected visualization type and call the respective rendering function
@@ -193,13 +246,43 @@ d3.csv('data/national_health_data.csv')
             document.getElementById('map2-label').textContent = getCategoryLabel(category2);
             
             break;
-          case 'histogram':
-              // renderHistogram(loadedData, category1, category2);
-              break;
-          default:
-              console.log('Invalid visualization type selected.');
-              break;
-      }
+
+            case 'histogram':
+                // Clear the parent elements first
+                document.getElementById('map1').innerHTML = '';
+                document.getElementById('map2').innerHTML = '';
+    
+                // Process data for the first histogram
+                processDataForCharts(category1).then(data => {
+                    histogram1Data = data;
+                    // Create an instance of Histogram for the first histogram
+                    const histogram1 = new Histogram('.map1', histogram1Data, {
+                        containerWidth: 600,
+                        containerHeight: 600,
+                        margin: {top: 10, right: 10, bottom: 10, left: 10}
+                    });
+                });
+    
+                // Process data for the second histogram
+                processDataForCharts(category2).then(data => {
+                    histogram2Data = data;
+                    // Create an instance of Histogram for the second histogram
+                    const histogram2 = new Histogram('.map2', histogram2Data, {
+                        containerWidth: 600,
+                        containerHeight: 600,
+                        margin: {top: 10, right: 10, bottom: 10, left: 10}
+                    });
+                });
+    
+                document.getElementById('map1-label').textContent = getCategoryLabel(category1);
+                document.getElementById('map2-label').textContent = getCategoryLabel(category2);
+    
+                break;
+    
+            default:
+                console.log('Invalid visualization type selected.');
+                break;
+        }
     }
 
     // Event listeners for dropdown menus
@@ -226,15 +309,17 @@ d3.csv('data/national_health_data.csv')
         switch (vizType) {
             case 'scatterplot':
                 // Call function to render scatterplot
-                // renderScatterplot();
                 break;
             case 'chloropleth':
                 // Call updatevizfunction to render chloropleth
                 updateVisualization(category1, category2, vizType);
                 break;
             case 'histogram':
-                // Call function to render histogram
-                // renderHistogram();
+                console.log('Category 1:', category1);
+                console.log('Category 2:', category2);
+                
+                updateVisualization(category1, category2, vizType);
+
                 break;
             default:
                 console.log('Invalid visualization type selected.');

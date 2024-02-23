@@ -142,7 +142,12 @@ class ChoroplethMap {
               tooltip.style.display = 'block';
               tooltip.style.left = (event.pageX + vis.config.tooltipPadding) + 'px';
               tooltip.style.top = (event.pageY + vis.config.tooltipPadding) + 'px';
-          });
+          })
+          .on('mouseleave', () => {
+            // Hide tooltip when mouse leaves
+            const tooltip = document.getElementById('tooltip');
+            tooltip.style.display = 'none';
+        });
       
 
       vis.g.append("path")
