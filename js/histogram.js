@@ -99,10 +99,6 @@ class Histogram {
     initVis() {
         let vis = this;
     
-        // Log initialization
-        console.log('Initializing histogram...');
-        console.log('Parent element:', vis.parentElement);
-    
         // Define visualization dimensions
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
@@ -118,22 +114,15 @@ class Histogram {
         vis.barGroup = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
     
-        // Define scales based on data types
-        if (vis.data.every(d => typeof d.categoryData === 'number')) {
-            // For numerical data
-            vis.xScale = d3.scaleBand()
-                .domain(vis.data.map(d => d.countyName))
-                .range([0, vis.width])
-                .padding(0.1);
+        // Define scales for x and y axes
+        vis.xScale = d3.scaleBand()
+            .domain([]) // Placeholder domain, will be updated dynamically
+            .range([0, vis.width])
+            .padding(0.1);
     
-            // For y-axis, since the domain is not known, we'll define a linear scale with a placeholder domain
-            vis.yScale = d3.scaleLinear()
-                .domain([0, 1]) // Placeholder domain, will be updated dynamically
-                .range([vis.height, 0]); // Inverted range for y-axis
-        }
-    
-        // Calculate the width of the bars
-        vis.barWidth = vis.xScale.bandwidth ? vis.xScale.bandwidth() : vis.width / vis.data.length;
+        vis.yScale = d3.scaleLinear()
+            .domain([0, 1]) // Placeholder domain, will be updated dynamically
+            .range([vis.height, 0]); // Inverted range for y-axis
     
         // Create x-axis
         vis.xAxis = d3.axisBottom(vis.xScale);
@@ -142,14 +131,21 @@ class Histogram {
         vis.svg.append('g')
             .attr('class', 'x-axis')
             .attr('transform', `translate(${vis.config.margin.left}, ${vis.height + vis.config.margin.top - 20})`)
-            .call(vis.xAxis);
+            .call(vis.xAxis)
+            .selectAll('text')
+            .attr('transform', 'rotate(-45)')
+            .attr('text-anchor', 'end')
+            .attr('dx', '-.8em')
+            .attr('dy', '.15em');
     
-        // Label the x-axis
-        vis.svg.append('text')
-            .attr('class', 'x-axis-label')
-            .attr('transform', `translate(${vis.width / 2},${vis.height + vis.config.margin.top + 30})`)
-            .style('text-anchor', 'middle')
-            .text(vis.category); // Use the category for labeling
+        // Create y-axis
+        vis.yAxis = d3.axisLeft(vis.yScale);
+    
+        // Append y-axis to SVG
+        vis.svg.append('g')
+            .attr('class', 'y-axis')
+            .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top})`)
+            .call(vis.yAxis);
     
         // Log successful initialization
         console.log('Histogram initialized successfully.');
@@ -157,7 +153,8 @@ class Histogram {
         // Render the bars
         vis.renderBars();
     }
-
+    
+    
     renderBars() {
         let vis = this;
 
@@ -213,12 +210,15 @@ class Histogram {
         // Update the yScale domain based on the maximum count
         vis.yScale.domain([0, maxCount]);
     
+        // Collect categories after grouping the data
+        let categories = Object.keys(groupedData);
+    
         // Calculate the width of each bar based on the number of groups and available space
-        let numGroups = Object.keys(groupedData).length;
+        let numGroups = categories.length;
         let barWidth = vis.width / numGroups;
     
         // Render bars for each group
-        Object.keys(groupedData).forEach((value, index) => {
+        categories.forEach((value, index) => {
             let data = groupedData[value];
     
             // Calculate x position for the group
@@ -227,18 +227,38 @@ class Histogram {
             // Render a single bar for the group
             vis.barGroup.append('rect')
                 .attr('class', 'bar')
-                .attr('x', xPosition)
-                .attr('y', vis.yScale(data.length))
+                .attr('x', vis.config.margin.left + xPosition) // Adjust the x-coordinate
+                .attr('y', vis.yScale(data.length) + vis.config.margin.top) // Adjust the y-coordinate
                 .attr('width', barWidth)
                 .attr('height', vis.height - vis.yScale(data.length))
                 .attr('fill', 'steelblue');
         });
     
+        // Update x-axis labels based on categories
+        vis.xScale = d3.scaleBand()
+            .domain(categories)
+            .range([0, vis.width])
+            .padding(0.1);
+    
+        // Update x-axis
+        vis.svg.select('.x-axis')
+            .transition()
+            .duration(500)
+            .attr('transform', `translate(${vis.config.margin.left}, ${vis.height + vis.config.margin.top})`) // Adjust x-axis translation
+            .call(d3.axisBottom(vis.xScale).tickFormat((d, i) => categories[i]))
+            .selectAll('text')
+            .attr('transform', 'rotate(-45)')
+            .attr('text-anchor', 'end')
+            .attr('dx', '-.8em')
+            .attr('dy', '.15em');
+        
         // Update the y-axis based on the new domain
         vis.svg.select('.y-axis')
             .transition()
             .duration(500)
             .call(d3.axisLeft(vis.yScale));
     }
+    
+    
 
 }
