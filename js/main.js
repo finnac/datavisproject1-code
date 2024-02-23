@@ -227,8 +227,8 @@ function processDataForCharts(category) {
             // Process data for the first choropleth
             processDataForChoropleth(category1).then(chloropleth1Data => {
                 const choroplethMap1 = new ChoroplethMap('.map1', category1, chloropleth1Data, {
-                    containerWidth: 600,
-                    containerHeight: 600,
+                    containerWidth: 750,
+                    containerHeight: 650,
                     margin: {top: 10, right: 10, bottom: 10, left: 10}
                 });
             });
@@ -236,8 +236,8 @@ function processDataForCharts(category) {
             // Process data for the second choropleth
             processDataForChoropleth(category2).then(chloropleth2Data => {
                 const choroplethMap2 = new ChoroplethMap('.map2', category2, chloropleth2Data, {
-                    containerWidth: 600,
-                    containerHeight: 600,
+                    containerWidth: 750,
+                    containerHeight: 650,
                     margin: {top: 10, right: 10, bottom: 10, left: 10}
                 });
             });
