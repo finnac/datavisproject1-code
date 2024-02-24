@@ -36,13 +36,60 @@ class Histogram {
             .attr('class', 'center-container')
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight);
+
+
+
         
         // Render the histogram
+        
         vis.renderGroupedBars(vis.groupData(vis.data, 'percentage'));
 
           // Adjust SVG size after rendering
         vis.svg.attr('width', parseInt(vis.svg.attr('width')) + 50)
         .attr('height', parseInt(vis.svg.attr('height')) + 50);
+    }
+
+    groupDataObjects(data, dataType) {
+        // Define the minimum and maximum values for the bins
+        const minValue = 0;
+        const maxValue = 100;
+    
+        // Define the number of bins
+        const numberOfBins = 10;
+    
+        // Calculate the bin width
+        const binWidth = (maxValue - minValue) / numberOfBins;
+    
+        // Initialize bins array
+        const bins = [];
+    
+        // Create bins
+        for (let i = 0; i < numberOfBins; i++) {
+            const start = minValue + i * binWidth;
+            const end = start + binWidth;
+            bins.push({
+                start,
+                end,
+                data: [] // Initialize an empty array to store data objects
+            });
+        }
+    
+        // Store data objects in bins
+        data.forEach(datum => {
+            const value = datum.categoryData;
+            const bin = bins.find(bin => {
+                if (value === -1) {
+                    return bin.start === -1 && bin.end === -1;
+                } else {
+                    return value >= bin.start && value < bin.end;
+                }
+            });
+            if (bin) {
+                bin.data.push(datum); // Push the entire data object into the bin's data array
+            }
+        });
+    
+        return bins;
     }
     
     // Helper function to group counties by the category data
@@ -135,7 +182,6 @@ class Histogram {
             .attr('transform', 'rotate(-55)')
             .style('text-anchor', 'end')
             .text(function(d) {
-                console.log("Label value:", d);
                 if (d === "-1.00 - -1.00") {
                     return "No Data";
                 } else {
@@ -147,6 +193,8 @@ class Histogram {
             .attr('class', 'bars')
             .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top})`);
 
+
+          // Add mouseover event handler to the bars
             bars.selectAll('rect')
             .data(groupedData)
             .enter()
@@ -156,11 +204,27 @@ class Histogram {
             .attr('width', d => xScale(d.count))
             .attr('height', yScale.bandwidth())
             .attr('fill', 'steelblue')
-            .on('mouseover', (event, d) => {
+            .on('mouseover', function(event, d) {
+
                 // Calculate tooltip position
                 const x = event.pageX + 10;
                 const y = event.pageY - 10;
+
+                // Filter data objects for the current bin index 
+                const groupedDataObjects = vis.groupDataObjects(vis.data, 'percentage');
+
+
+                const binIndex = groupedData.indexOf(d);
+                const binObjects = groupedDataObjects[binIndex].data;
+                console.log(binObjects)
                 
+                // // Create a scrollable list of counties in the tooltip
+                // let countyList = '<div class="speech-bubble"><strong>Counties:</strong><br>';
+                // binObjects.forEach(county => {
+                //     countyList += `${county.countyName}: ${county.categoryData}<br>`;
+                // });
+                // countyList += '</div>';
+
                 // Construct tooltip content
                 const tooltipContent = `
                     <div><strong>Range:</strong> ${d.start.toFixed(2)} - ${d.end.toFixed(2)}</div>
@@ -175,14 +239,12 @@ class Histogram {
                     .style('top', `${y}px`)
                     .style('display', 'block');
             })
-            .on('mouseout', () => {
-                // Hide the tooltip on mouseout
-                d3.select('#tooltip').style('display', 'none');
+            // Add mouseout event handler to hide the tooltip
+            .on('mouseout', function() {
+                d3.select('.tooltip').style('display', 'none');
             });
 
-    
     }
-
 
     }
 
