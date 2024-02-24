@@ -1,87 +1,3 @@
-// Function to get the user-friendly label for each category
-function getCategoryLabel(category) {
-    switch (category) {
-        case 'poverty_perc':
-            return 'Poverty Percentage';
-        case 'median_household_income':
-            return 'Median Household Income';
-        case 'education_less_than_high_school_percent':
-            return 'Education Less Than High School Percentage';
-        case 'air_quality':
-            return 'Air Quality';
-        case 'park_access':
-            return 'Park Access';
-        case 'percent_inactive':
-            return 'Percent Inactive';
-        case 'percent_smoking':
-            return 'Percent Smoking';
-        case 'urban_rural_status':
-            return 'Urban/Rural Status';
-        case 'elderly_percentage':
-            return 'Elderly Percentage';
-        case 'number_of_hospitals':
-            return 'Number of Hospitals';
-        case 'number_of_primary_care_physicians':
-            return 'Number of Primary Care Physicians';
-        case 'percent_no_heath_insurance':
-            return 'Percent No Health Insurance';
-        case 'percent_high_blood_pressure':
-            return 'Percent High Blood Pressure';
-        case 'percent_coronary_heart_disease':
-            return 'Percent Coronary Heart Disease';
-        case 'percent_stroke':
-            return 'Percent Stroke';
-        case 'percent_high_cholesterol':
-            return 'Percent High Cholesterol';
-        default:
-            return category; // Use the category name as the label by default
-    }
-  }
-
-  // Function to check if the category represents a percentage
-function isPercentageCategory(category) {
-    switch (category) {
-        case 'poverty_perc':
-        case 'education_less_than_high_school_percent':
-        case 'percent_inactive':
-        case 'percent_smoking':
-        case 'elderly_percentage':
-        case 'percent_no_heath_insurance':
-        case 'percent_high_blood_pressure':
-        case 'percent_coronary_heart_disease':
-        case 'percent_stroke':
-        case 'percent_high_cholesterol':
-            return true;
-        default:
-            return false;
-    }
-}
-
-// Function to check if the category represents numbers
-function isNumberCategory(category) {
-    switch (category) {
-        case 'number_of_hospitals':
-        case 'number_of_primary_care_physicians':
-            return true;
-        case 'park_access':
-            return true;
-        case 'air_quality':
-            return true;
-        default:
-            return false;
-    }
-}
-
-// Function to check if the category is categorical
-function isCategoricalCategory(category) {
-    switch (category) {
-        case 'urban_rural_status':
-            return true;
-        default:
-            return false;
-    }
-}
-
 class Histogram {
     constructor(parentElement, category, data, config) {
         this.parentElement = parentElement;
@@ -109,156 +25,108 @@ class Histogram {
             .attr('class', 'center-container')
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight);
-    
-        // Create a group for the bars
-        vis.barGroup = vis.svg.append('g')
-            .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
-    
-        // Define scales for x and y axes
-        vis.xScale = d3.scaleBand()
-            .domain([]) // Placeholder domain, will be updated dynamically
-            .range([0, vis.width])
-            .padding(0.1);
-    
-        vis.yScale = d3.scaleLinear()
-            .domain([0, 1]) // Placeholder domain, will be updated dynamically
-            .range([vis.height, 0]); // Inverted range for y-axis
-    
-        // Create x-axis
-        vis.xAxis = d3.axisBottom(vis.xScale);
-    
-        // Append x-axis to SVG
-        vis.svg.append('g')
-            .attr('class', 'x-axis')
-            .attr('transform', `translate(${vis.config.margin.left}, ${vis.height + vis.config.margin.top - 20})`)
-            .call(vis.xAxis)
-            .selectAll('text')
-            .attr('transform', 'rotate(-45)')
-            .attr('text-anchor', 'end')
-            .attr('dx', '-.8em')
-            .attr('dy', '.15em');
-    
-        // Create y-axis
-        vis.yAxis = d3.axisLeft(vis.yScale);
-    
-        // Append y-axis to SVG
-        vis.svg.append('g')
-            .attr('class', 'y-axis')
-            .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top})`)
-            .call(vis.yAxis);
-    
-        // Log successful initialization
-        console.log('Histogram initialized successfully.');
-    
-        // Render the bars
-        vis.renderBars();
+        
+        // Render the histogram
+        vis.renderGroupedBars(vis.groupData(vis.data, 'percentage'));
     }
     
-    
-    renderBars() {
-        let vis = this;
-
-        // Filter the data with valid values and missing values
-        let validData = vis.data.filter(d => d.categoryData !== -1);
-        let missingData = vis.data.filter(d => d.categoryData === -1);
-
-        // Determine the data type based on the category
-        let dataType;
-        if (isPercentageCategory(vis.category)) {
-            dataType = 'percentage';
-        } else if (isNumberCategory(vis.category)) {
-            dataType = 'number';
-        } else if (isCategoricalCategory(vis.category)) {
-            dataType = 'categorical';
-        }
-
-        // Group the counties with similar values
-        let groupedData = vis.groupData(validData, dataType);
-
-        // Render bars for grouped data
-        vis.renderGroupedBars(groupedData);
-    }
-
-    // Helper function to group counties with similar values
+    // Helper function to group counties by the category data
     groupData(data, dataType) {
-        let groupedData = {};
+        // Define a function to create bins for the histogram
+        const createBins = (data, dataType) => {
+            const values = data.map(d => d.categoryData);
 
-        data.forEach(d => {
-            let value = d.categoryData;
+            // Calculate the minimum and maximum values
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
 
-            // Round the value for percentage and number types
-            if (dataType === 'percentage' || dataType === 'number') {
-                value = Math.round(value);
+            // Determine the number of bins based on data type
+            let numberOfBins;
+            if (dataType === 'percentage') {
+                numberOfBins = 10; // You can adjust this value based on your preference
+            } else {
+                numberOfBins = 20; // Or adjust as needed
             }
 
-            if (!groupedData[value]) {
-                groupedData[value] = [];
-            }
+            // Calculate bin width
+            const binWidth = (maxValue - minValue) / numberOfBins;
 
-            groupedData[value].push(d);
-        });
+            // Create bins
+            const bins = Array.from({ length: numberOfBins }, (_, index) => {
+                const start = minValue + index * binWidth;
+                const end = start + binWidth;
+                return {
+                    start,
+                    end,
+                    count: 0
+                };
+            });
 
-        return groupedData;
+            // Count data points in each bin
+            data.forEach(datum => {
+                const value = datum.categoryData;
+                const bin = bins.find(bin => value >= bin.start && value < bin.end);
+                if (bin) {
+                    bin.count++;
+                }
+            });
+
+            return bins;
+        };
+
+        // Create bins based on the data and data type
+        const bins = createBins(data, dataType);
+        return bins;
     }
 
     renderGroupedBars(groupedData) {
         let vis = this;
-    
-        // Determine the maximum count for scaling the y-axis
-        let maxCount = d3.max(Object.values(groupedData), d => d.length);
-    
-        // Update the yScale domain based on the maximum count
-        vis.yScale.domain([0, maxCount]);
-    
-        // Collect categories after grouping the data
-        let categories = Object.keys(groupedData);
-    
-        // Calculate the width of each bar based on the number of groups and available space
-        let numGroups = categories.length;
-        let barWidth = vis.width / numGroups;
-    
-        // Render bars for each group
-        categories.forEach((value, index) => {
-            let data = groupedData[value];
-    
-            // Calculate x position for the group
-            let xPosition = index * barWidth;
-    
-            // Render a single bar for the group
-            vis.barGroup.append('rect')
-                .attr('class', 'bar')
-                .attr('x', vis.config.margin.left + xPosition) // Adjust the x-coordinate
-                .attr('y', vis.yScale(data.length) + vis.config.margin.top) // Adjust the y-coordinate
-                .attr('width', barWidth)
-                .attr('height', vis.height - vis.yScale(data.length))
-                .attr('fill', 'steelblue');
-        });
-    
-        // Update x-axis labels based on categories
-        vis.xScale = d3.scaleBand()
-            .domain(categories)
-            .range([0, vis.width])
+
+        // Define x scale
+        const xScale = d3.scaleLinear()
+            .domain([0, d3.max(groupedData, d => d.count)])
+            .range([0, vis.width]);
+
+        // Define y scale
+        const yScale = d3.scaleBand()
+            .domain(groupedData.map(d => `${d.start.toFixed(2)} - ${d.end.toFixed(2)}`))
+            .range([vis.height, 0]) // Reversed range to start from the top
             .padding(0.1);
-    
-        // Update x-axis
-        vis.svg.select('.x-axis')
-            .transition()
-            .duration(500)
-            .attr('transform', `translate(${vis.config.margin.left}, ${vis.height + vis.config.margin.top})`) // Adjust x-axis translation
-            .call(d3.axisBottom(vis.xScale).tickFormat((d, i) => categories[i]))
+
+        // Create SVG group element for bars
+        const bars = vis.svg.append('g')
+            .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top})`);
+
+        // Create and append bars
+        bars.selectAll('rect')
+            .data(groupedData)
+            .enter().append('rect')
+            .attr('x', vis.config.margin.left) // Adjust x position to accommodate y-axis
+            .attr('y', d => yScale(`${d.start.toFixed(2)} - ${d.end.toFixed(2)}`))
+            .attr('width', d => xScale(d.count))
+            .attr('height', yScale.bandwidth())
+            .attr('fill', 'steelblue');
+
+        // Add x-axis
+        const xAxis = d3.axisBottom(xScale);
+        vis.svg.append('g')
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top + vis.height})`)
+            .call(xAxis)
+            .append('text')
+            .attr('x', vis.width / 2)
+            .attr('y', 40)
+            .attr('text-anchor', 'middle')
+            .text('Count');
+
+        // Add y-axis
+        const yAxis = d3.axisLeft(yScale);
+        vis.svg.append('g')
+            .attr('class', 'y-axis')
+            .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top})`)
+            .call(yAxis)
             .selectAll('text')
             .attr('transform', 'rotate(-45)')
-            .attr('text-anchor', 'end')
-            .attr('dx', '-.8em')
-            .attr('dy', '.15em');
-        
-        // Update the y-axis based on the new domain
-        vis.svg.select('.y-axis')
-            .transition()
-            .duration(500)
-            .call(d3.axisLeft(vis.yScale));
+            .style('text-anchor', 'end');
     }
-    
-    
-
 }
