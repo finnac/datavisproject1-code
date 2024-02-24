@@ -93,40 +93,48 @@ class Histogram {
             .range([vis.height, 0]) // Reversed range to start from the top
             .padding(0.1);
 
-        // Create SVG group element for bars
-        const bars = vis.svg.append('g')
-            .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top})`);
+    // Add x-axis
+    const xAxis = d3.axisBottom(xScale);
+    vis.svg.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top + vis.height})`) // Adjusted margin for x-axis
+        .call(xAxis)
+        .append('text')
+        .attr('x', vis.width / 2)
+        .attr('y', 40)
+        .attr('text-anchor', 'middle')
+        .text('Count');
 
-        // Create and append bars
-        bars.selectAll('rect')
-            .data(groupedData)
-            .enter().append('rect')
-            .attr('x', vis.config.margin.left) // Adjust x position to accommodate y-axis
-            .attr('y', d => yScale(`${d.start.toFixed(2)} - ${d.end.toFixed(2)}`))
-            .attr('width', d => xScale(d.count))
-            .attr('height', yScale.bandwidth())
-            .attr('fill', 'steelblue');
+    // Add y-axis
+    const yAxis = d3.axisLeft(yScale);
+    vis.svg.append('g')
+        .attr('class', 'y-axis')
+        .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top})`)
+        .call(yAxis)
+        .selectAll('text')
+        .style('font-size', '10px') // Reduce font size
+        .attr('transform', 'rotate(-45)')
+        .style('text-anchor', 'end');
 
-        // Add x-axis
-        const xAxis = d3.axisBottom(xScale);
-        vis.svg.append('g')
-            .attr('class', 'x-axis')
-            .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top + vis.height})`)
-            .call(xAxis)
-            .append('text')
-            .attr('x', vis.width / 2)
-            .attr('y', 40)
-            .attr('text-anchor', 'middle')
-            .text('Count');
+    // Create SVG group element for bars
+    const bars = vis.svg.append('g')
+        .attr('class', 'bars')
+        .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top})`);
 
-        // Add y-axis
-        const yAxis = d3.axisLeft(yScale);
-        vis.svg.append('g')
-            .attr('class', 'y-axis')
-            .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top})`)
-            .call(yAxis)
-            .selectAll('text')
-            .attr('transform', 'rotate(-45)')
-            .style('text-anchor', 'end');
+    // Create and append bars
+    bars.selectAll('rect')
+    .data(groupedData)
+    .enter().append('rect')
+    .attr('x', 0) // Align with the y-axis
+    .attr('y', d => yScale(`${d.start.toFixed(2)} - ${d.end.toFixed(2)}`)) // Position rectangles directly above the x-axis
+    .attr('width', d => xScale(d.count))
+    .attr('height', yScale.bandwidth()) // Set the height to bandwidth to cover the full range of the y-axis
+    .attr('fill', 'steelblue');
+
+
+    
+        
+
+
     }
 }
