@@ -36,50 +36,54 @@ class Histogram {
     
     // Helper function to group counties by the category data
     groupData(data, dataType) {
-        // Define a function to create bins for the histogram
-        const createBins = (data, dataType) => {
-            const values = data.map(d => d.categoryData);
-
-            // Calculate the minimum and maximum values
-            const minValue = Math.min(...values);
-            const maxValue = Math.max(...values);
-
-            // Determine the number of bins based on data type
-            let numberOfBins;
-            if (dataType === 'percentage') {
-                numberOfBins = 10; // You can adjust this value based on your preference
-            } else {
-                numberOfBins = 20; // Or adjust as needed
-            }
-
-            // Calculate bin width
-            const binWidth = (maxValue - minValue) / numberOfBins;
-
-            // Create bins
-            const bins = Array.from({ length: numberOfBins }, (_, index) => {
-                const start = minValue + index * binWidth;
-                const end = start + binWidth;
-                return {
-                    start,
-                    end,
-                    count: 0
-                };
+        // Define the minimum and maximum values for the bins
+        const minValue = 0;
+        const maxValue = 100;
+    
+        // Define the number of bins
+        const numberOfBins = 10;
+    
+        // Calculate the bin width
+        const binWidth = (maxValue - minValue) / numberOfBins;
+    
+        // Initialize bins array
+        const bins = [];
+    
+        // Create the "No Data" bin
+        const noDataBin = {
+            start: -1,
+            end: -1,
+            label: "No Data",
+            count: 0
+        };
+        bins.push(noDataBin);
+    
+        // Create other bins
+        for (let i = 0; i < numberOfBins; i++) {
+            const start = minValue + i * binWidth;
+            const end = start + binWidth;
+            bins.push({
+                start,
+                end,
+                count: 0
             });
-
-            // Count data points in each bin
-            data.forEach(datum => {
-                const value = datum.categoryData;
-                const bin = bins.find(bin => value >= bin.start && value < bin.end);
-                if (bin) {
-                    bin.count++;
+        }
+    
+        // Count data points in each bin
+        data.forEach(datum => {
+            const value = datum.categoryData;
+            const bin = bins.find(bin => {
+                if (value === -1) {
+                    return bin.start === -1 && bin.end === -1;
+                } else {
+                    return value >= bin.start && value < bin.end;
                 }
             });
-
-            return bins;
-        };
-
-        // Create bins based on the data and data type
-        const bins = createBins(data, dataType);
+            if (bin) {
+                bin.count++;
+            }
+        });
+    
         return bins;
     }
 
@@ -117,9 +121,16 @@ class Histogram {
         .call(yAxis)
         .selectAll('text')
         .style('font-size', '10px') // Reduce font size
-        .attr('transform', 'rotate(-45)')
-        .style('text-anchor', 'end');
-
+        .attr('transform', 'rotate(-55)')
+        .style('text-anchor', 'end')
+        .text(function(d) {
+            console.log("Label value:", d);
+            if (d === "-1.00 - -1.00") {
+                return "No Data";
+            } else {
+                return d.replace(/\s/g, ''); // Remove whitespace using regular expression
+            }
+        });
     // Create SVG group element for bars
     const bars = vis.svg.append('g')
         .attr('class', 'bars')
