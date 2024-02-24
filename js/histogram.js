@@ -246,7 +246,7 @@ class Histogram {
             })
             // Add mouseout event handler to hide the tooltip
             .on('mouseout', function() {
-                d3.select('.tooltip').style('display', 'none');
+                d3.select('#tooltip').style('display', 'none');
             });
 
     }
