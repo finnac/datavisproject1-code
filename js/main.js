@@ -16,11 +16,6 @@ let histogram2Data;
 let category1 = 'poverty_perc'; // Default value for category1
 let category2 = 'education_less_than_high_school_percent'; // Default value for category2
 
-////HEY LOOK HERE DUMBASS ASHLEY LOOK
-//ONLY MAKE IT DYNAMICALLY HANDLE PERCENTAGE CATEGORIES
-//MAKE EVERYTHING ELSE GO FUCK ITSELF :D
-//DO THE SAME ON SCATTERPLOT
-
 d3.csv('data/national_health_data.csv')
   .then(data => {
     console.log('Data loading complete.');
