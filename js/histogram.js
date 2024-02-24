@@ -55,17 +55,17 @@ class Histogram {
         const maxValue = 100;
     
         // Define the number of bins
-        const numberOfBins = 10;
+        const numberOfBins = 11;
     
         // Calculate the bin width
-        const binWidth = (maxValue - minValue) / numberOfBins;
+        const binWidth = (maxValue - minValue) / (numberOfBins - 1); // Subtract 1 for the "no data" bin
     
         // Initialize bins array
         const bins = [];
     
         // Create bins
         for (let i = 0; i < numberOfBins; i++) {
-            const start = minValue + i * binWidth;
+            const start = minValue + (i - 1) * binWidth; // Adjusted start calculation
             const end = start + binWidth;
             bins.push({
                 start,
@@ -77,21 +77,18 @@ class Histogram {
         // Store data objects in bins
         data.forEach(datum => {
             const value = datum.categoryData;
-            const bin = bins.find(bin => {
-                if (value === -1) {
-                    return bin.start === -1 && bin.end === -1;
-                } else {
-                    return value >= bin.start && value < bin.end;
+            if (value === -1) {
+                bins[0].data.push(datum); // Store "no data" in the first bin
+            } else {
+                const binIndex = Math.floor((value - minValue) / binWidth) + 1; // Adjusted bin index calculation
+                if (binIndex >= 0 && binIndex < numberOfBins) {
+                    bins[binIndex].data.push(datum); // Push the entire data object into the corresponding bin's data array
                 }
-            });
-            if (bin) {
-                bin.data.push(datum); // Push the entire data object into the bin's data array
             }
         });
     
         return bins;
     }
-    
     // Helper function to group counties by the category data
     groupData(data, dataType) {
         // Define the minimum and maximum values for the bins
@@ -214,21 +211,29 @@ class Histogram {
                 const groupedDataObjects = vis.groupDataObjects(vis.data, 'percentage');
 
 
-                const binIndex = groupedData.indexOf(d);
+                const binIndex = groupedData.findIndex(bin => bin.start === d.start && bin.end === d.end);
+                console.log(binIndex)
                 const binObjects = groupedDataObjects[binIndex].data;
-                console.log(binObjects)
-                
-                // // Create a scrollable list of counties in the tooltip
-                // let countyList = '<div class="speech-bubble"><strong>Counties:</strong><br>';
-                // binObjects.forEach(county => {
-                //     countyList += `${county.countyName}: ${county.categoryData}<br>`;
-                // });
-                // countyList += '</div>';
+                // console.log(binObjects)
+                // console.log("groupedataobjects:")
+                // console.log(groupedDataObjects)
+                // console.log("groupeddata:")
+                // console.log(groupedData)
+               // Create a scrollable list of counties in the tooltip
+                let countyList = '<div class="scrollable-list">'; // Wrap the list in a container
+                binObjects.forEach(county => {
+                    countyList += `<div>${county.countyName}: ${county.categoryData}</div>`;
+                });
+                countyList += '</div>'; // Close the container
+
+                const rangeLabel = d.start === -1.0 && d.end === -1.0 ? 'No Data' : `${d.start.toFixed(2)} - ${d.end.toFixed(2)}`;
+                const countDisplay = d.count === -1 ? "No Data" : d.count;
 
                 // Construct tooltip content
                 const tooltipContent = `
-                    <div><strong>Range:</strong> ${d.start.toFixed(2)} - ${d.end.toFixed(2)}</div>
-                    <div><strong>Count:</strong> ${d.count}</div>
+                    <div><strong>Range:</strong> ${rangeLabel}</div>
+                    <div><strong>Count:</strong> ${countDisplay}</div>
+                    ${countyList} <!-- Append the scrollable list of counties -->
                     <!-- Add more details as needed -->
                 `;
                 
