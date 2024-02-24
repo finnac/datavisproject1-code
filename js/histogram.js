@@ -5,6 +5,17 @@ class Histogram {
         this.config = config;
         this.category = category; // Store the category for labeling
 
+         this.tooltip = d3.select(parentElement)
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        this.tooltip.append("div")
+            .attr("class", "tooltip-label");
+
+        this.tooltip.append("div")
+            .attr("class", "tooltip-county-list");
+
         // Log data for debugging purposes
         console.log('Data fed into histogram:', data);
 
@@ -101,55 +112,77 @@ class Histogram {
             .range([vis.height, 0]) // Reversed range to start from the top
             .padding(0.1);
 
-    // Add x-axis
-    const xAxis = d3.axisBottom(xScale);
-    vis.svg.append('g')
-        .attr('class', 'x-axis')
-        .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top + vis.height})`) // Adjusted margin for x-axis
-        .call(xAxis)
-        .append('text')
-        .attr('x', vis.width / 2)
-        .attr('y', 40)
-        .attr('text-anchor', 'middle')
-        .text('Count');
+        // Add x-axis
+        const xAxis = d3.axisBottom(xScale);
+        vis.svg.append('g')
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top + vis.height})`) // Adjusted margin for x-axis
+            .call(xAxis)
+            .append('text')
+            .attr('x', vis.width / 2)
+            .attr('y', 40)
+            .attr('text-anchor', 'middle')
+            .text('Count');
 
-    // Add y-axis
-    const yAxis = d3.axisLeft(yScale);
-    vis.svg.append('g')
-        .attr('class', 'y-axis')
-        .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top})`)
-        .call(yAxis)
-        .selectAll('text')
-        .style('font-size', '10px') // Reduce font size
-        .attr('transform', 'rotate(-55)')
-        .style('text-anchor', 'end')
-        .text(function(d) {
-            console.log("Label value:", d);
-            if (d === "-1.00 - -1.00") {
-                return "No Data";
-            } else {
-                return d.replace(/\s/g, ''); // Remove whitespace using regular expression
-            }
-        });
-    // Create SVG group element for bars
-    const bars = vis.svg.append('g')
-        .attr('class', 'bars')
-        .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top})`);
+        // Add y-axis
+        const yAxis = d3.axisLeft(yScale);
+        vis.svg.append('g')
+            .attr('class', 'y-axis')
+            .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top})`)
+            .call(yAxis)
+            .selectAll('text')
+            .style('font-size', '10px') // Reduce font size
+            .attr('transform', 'rotate(-55)')
+            .style('text-anchor', 'end')
+            .text(function(d) {
+                console.log("Label value:", d);
+                if (d === "-1.00 - -1.00") {
+                    return "No Data";
+                } else {
+                    return d.replace(/\s/g, ''); // Remove whitespace using regular expression
+                }
+            });
+        // Create SVG group element for bars
+        const bars = vis.svg.append('g')
+            .attr('class', 'bars')
+            .attr('transform', `translate(${vis.config.margin.left + 30}, ${vis.config.margin.top})`);
 
-    // Create and append bars
-    bars.selectAll('rect')
-    .data(groupedData)
-    .enter().append('rect')
-    .attr('x', 0) // Align with the y-axis
-    .attr('y', d => yScale(`${d.start.toFixed(2)} - ${d.end.toFixed(2)}`)) // Position rectangles directly above the x-axis
-    .attr('width', d => xScale(d.count))
-    .attr('height', yScale.bandwidth()) // Set the height to bandwidth to cover the full range of the y-axis
-    .attr('fill', 'steelblue');
-
+            bars.selectAll('rect')
+            .data(groupedData)
+            .enter()
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', d => yScale(`${d.start.toFixed(2)} - ${d.end.toFixed(2)}`))
+            .attr('width', d => xScale(d.count))
+            .attr('height', yScale.bandwidth())
+            .attr('fill', 'steelblue')
+            .on('mouseover', (event, d) => {
+                // Calculate tooltip position
+                const x = event.pageX + 10;
+                const y = event.pageY - 10;
+                
+                // Construct tooltip content
+                const tooltipContent = `
+                    <div><strong>Range:</strong> ${d.start.toFixed(2)} - ${d.end.toFixed(2)}</div>
+                    <div><strong>Count:</strong> ${d.count}</div>
+                    <!-- Add more details as needed -->
+                `;
+                
+                // Update tooltip content and position
+                d3.select('#tooltip')
+                    .html(tooltipContent)
+                    .style('left', `${x}px`)
+                    .style('top', `${y}px`)
+                    .style('display', 'block');
+            })
+            .on('mouseout', () => {
+                // Hide the tooltip on mouseout
+                d3.select('#tooltip').style('display', 'none');
+            });
 
     
-        
+    }
 
 
     }
-}
+
