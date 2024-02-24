@@ -244,11 +244,12 @@ class Histogram {
                     .style('top', `${y}px`)
                     .style('display', 'block');
             })
-            // Add mouseout event handler to hide the tooltip
-            .on('mouseout', function() {
+            
+            console.log(this.tooltip)
+                        // Add mouseout event handler to hide the tooltip when the mouse leaves the tooltip area
+            d3.select('#tooltip').on('mouseleave', function() {
                 d3.select('#tooltip').style('display', 'none');
-            });
-
+                });
     }
 
     }
