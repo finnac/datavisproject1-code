@@ -230,7 +230,7 @@ function processDataForCharts(category) {
             // Process data for the first choropleth
             processDataForChoropleth(category1).then(chloropleth1Data => {
                 const choroplethMap1 = new ChoroplethMap('.map1', category1, chloropleth1Data, {
-                    containerWidth: 750,
+                    containerWidth: 650,
                     containerHeight: 650,
                     margin: {top: 10, right: 10, bottom: 10, left: 10}
                 });
@@ -239,7 +239,7 @@ function processDataForCharts(category) {
             // Process data for the second choropleth
             processDataForChoropleth(category2).then(chloropleth2Data => {
                 const choroplethMap2 = new ChoroplethMap('.map2', category2, chloropleth2Data, {
-                    containerWidth: 750,
+                    containerWidth: 650,
                     containerHeight: 650,
                     margin: {top: 10, right: 10, bottom: 10, left: 10}
                 });
@@ -260,8 +260,8 @@ function processDataForCharts(category) {
                     histogram1Data = data;
                     // Create an instance of Histogram for the first histogram
                     const histogram1 = new Histogram('.map1', category1, histogram1Data, {
-                        containerWidth: 750,
-                        containerHeight: 650,
+                        containerWidth: 600,
+                        containerHeight: 600,
                         margin: {top: 10, right: 10, bottom: 10, left: 10}
                     });
                 });
@@ -271,8 +271,8 @@ function processDataForCharts(category) {
                     histogram2Data = data;
                     // Create an instance of Histogram for the second histogram
                     const histogram2 = new Histogram('.map2', category2, histogram2Data, {
-                        containerWidth: 750,
-                        containerHeight: 650,
+                        containerWidth: 600,
+                        containerHeight: 600,
                         margin: {top: 10, right: 10, bottom: 10, left: 10}
                     });
                 });

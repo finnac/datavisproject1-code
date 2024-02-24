@@ -28,6 +28,10 @@ class Histogram {
         
         // Render the histogram
         vis.renderGroupedBars(vis.groupData(vis.data, 'percentage'));
+
+          // Adjust SVG size after rendering
+        vis.svg.attr('width', parseInt(vis.svg.attr('width')) + 50)
+        .attr('height', parseInt(vis.svg.attr('height')) + 50);
     }
     
     // Helper function to group counties by the category data
