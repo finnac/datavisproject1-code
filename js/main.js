@@ -228,12 +228,12 @@ function processDataForCharts(category) {
                 processDataForCharts(category2).then(scatterplot2Data => {
                     // Combine two dataset arrays
                     const Scatterplot1 = new Scatterplot('.map1', scatterplot1Data, scatterplot2Data, category1, category2, {
-                        containerWidth: 750,
+                        containerWidth: 800,
                         containerHeight: 600,
-                        margin: {top: 10, right: 10, bottom: 10, left: 10}
+                        margin: {top: 30, right: 10, bottom: 10, left: 30}
                     });
                     
-                    document.getElementById('map1-label').textContent = "Correlation between " + getCategoryLabel(category1) + " and " + getCategoryLabel(category2);;
+                    document.getElementById('map1-label').textContent = "Correlation between " + getCategoryLabel(category1) + "and " + getCategoryLabel(category2);;
                    
                 });
             });

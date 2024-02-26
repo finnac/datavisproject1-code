@@ -68,41 +68,69 @@ class Scatterplot {
         // Initialize visualization
         this.initVis();
     }
-
     initVis() {
         let vis = this;
         category2DataCopy = this.category2Data;
-
+    
         // Define visualization dimensions
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
-
+    
         // Create SVG container for the scatterplot
         vis.svg = d3.select(vis.parentElement)
             .append('svg')
             .attr('class', 'center-container')
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight);
-
+    
+        // Append a group element for the main content, leaving space for axes
+        vis.mainGroup = vis.svg.append('g')
+            .attr('class', 'main-group')
+            .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.bottom})`);
+    
         // Render the scatterplot
         vis.renderScatterplot();
     }
-
+    
     renderScatterplot() {
         let vis = this;
-
+    
         // Define x scale
         const xScale = d3.scaleLinear()
             .domain([0, d3.max(vis.category1Data.map(d => d.categoryData))])
             .range([0, vis.width]);
-
+    
         // Define y scale
         const yScale = d3.scaleLinear()
             .domain([0, d3.max(vis.category2Data.map(d => d.categoryData))])
             .range([vis.height, 0]);
-
+    
+        // Add x-axis
+        vis.mainGroup.append('g')
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(0, ${vis.height})`)
+            .call(d3.axisBottom(xScale))
+            .append("text")
+            .attr("class", "axis-label")
+            .attr("x", vis.width / 2)
+            .attr("y", 40)
+            .style("text-anchor", "middle")
+            .text(getCategoryLabel(vis.category1));
+    
+        // Add y-axis
+        vis.mainGroup.append('g')
+            .attr('class', 'y-axis')
+            .call(d3.axisLeft(yScale))
+            .append("text")
+            .attr("class", "axis-label")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -vis.height / 2)
+            .attr("y", -40)
+            .style("text-anchor", "middle")
+            .text(getCategoryLabel(vis.category2));
+            
         // Add data points
-        vis.svg.selectAll('.circle')
+        vis.mainGroup.selectAll('.circle')
             .data(vis.category1Data)
             .enter()
             .append('circle')
@@ -114,10 +142,9 @@ class Scatterplot {
             .on('mouseover', function (event, d, i) {
                 const category1Datum = d;
                 console.log('category1data', d.categoryData);
-                
-             
+    
                 const category2Datum = category2DataCopy.find(item => item.countyName === d.countyName);
-
+    
                 console.log('Category2data:', category2Datum.categoryData)
                 const tooltipContent = `
                     <div class="tooltip-title">${d.countyName}</div>
@@ -126,7 +153,7 @@ class Scatterplot {
                     <div><strong>${getCategoryLabel(vis.category1)}:</strong> ${d.categoryData}</div>
                     <div><strong>${getCategoryLabel(vis.category2)}:</strong> ${category2Datum.categoryData}</div>
                 `;
-
+    
                 const tooltip = document.getElementById('tooltip');
                 tooltip.innerHTML = tooltipContent;
                 tooltip.style.display = 'block';
@@ -138,4 +165,5 @@ class Scatterplot {
                 tooltip.style.display = 'none';
             });
     }
+    
 }
