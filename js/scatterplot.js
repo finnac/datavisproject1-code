@@ -129,31 +129,43 @@ class Scatterplot {
             .style("text-anchor", "middle")
             .text(getCategoryLabel(vis.category2));
             
-        // Add data points
-        vis.mainGroup.selectAll('.circle')
+           // Add data points
+            vis.mainGroup.selectAll('.circle')
             .data(vis.category1Data)
             .enter()
             .append('circle')
             .attr('class', 'circle')
-            .attr('cx', d => xScale(d.categoryData))
-            .attr('cy', (d, i) => yScale(vis.category2Data[i].categoryData))
+            .attr('cx', d => {
+                if (d.categoryData === -1) {
+                    return 0; // Display on the x-axis if categoryData is -1
+                }
+                return xScale(d.categoryData);
+            })
+            .attr('cy', (d, i) => {
+                if (vis.category2Data[i].categoryData === -1) {
+                    return vis.height; // Display on the y-axis if category2Data is -1
+                }
+                return yScale(vis.category2Data[i].categoryData);
+            })
             .attr('r', 5)
             .attr('fill', 'steelblue')
             .on('mouseover', function (event, d, i) {
                 const category1Datum = d;
-                console.log('category1data', d.categoryData);
-    
+
                 const category2Datum = category2DataCopy.find(item => item.countyName === d.countyName);
-    
-                console.log('Category2data:', category2Datum.categoryData)
+                
+                // Check if category data is -1, if so, display "no data"
+                const category1Value = d.categoryData === -1 ? "No data" : d.categoryData;
+                const category2Value = category2Datum.categoryData === -1 ? "No data" : category2Datum.categoryData;
+
                 const tooltipContent = `
                     <div class="tooltip-title">${d.countyName}</div>
                     <div><strong>County Name:</strong>  ${d.countyName}</div>
                     <div><strong>County FIPS:</strong> ${d.countyFIPS}</div>
-                    <div><strong>${getCategoryLabel(vis.category1)}:</strong> ${d.categoryData}</div>
-                    <div><strong>${getCategoryLabel(vis.category2)}:</strong> ${category2Datum.categoryData}</div>
-                `;
-    
+                    <div><strong>${getCategoryLabel(vis.category2)}:</strong> ${category2Value}</div>
+                    <div><strong>${getCategoryLabel(vis.category1)}:</strong> ${category1Value}</div>
+ `;
+
                 const tooltip = document.getElementById('tooltip');
                 tooltip.innerHTML = tooltipContent;
                 tooltip.style.display = 'block';
@@ -164,6 +176,6 @@ class Scatterplot {
                 const tooltip = document.getElementById('tooltip');
                 tooltip.style.display = 'none';
             });
-    }
+        }
     
 }
