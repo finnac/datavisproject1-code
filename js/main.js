@@ -13,6 +13,10 @@ let chloropleth1Data;
 let chloropleth2Data;
 let histogram1Data;
 let histogram2Data;
+let scatterplot1Data;
+let scatterplot2Data;
+let combinedScatterplotData;
+
 let category1 = 'poverty_perc'; // Default value for category1
 let category2 = 'education_less_than_high_school_percent'; // Default value for category2
 
@@ -215,7 +219,29 @@ function processDataForCharts(category) {
       // Check the selected visualization type and call the respective rendering function
       switch (vizType) {
           case 'scatterplot':
-              // renderScatterplot(loadedData, category1, category2);
+              // Clear the parent elements first
+              document.getElementById('map1').innerHTML = '';
+              document.getElementById('map2').innerHTML = '';
+
+              console.log(typeof scatterplot1Data) 
+              console.log(typeof scatterplot2Data)
+
+              processDataForCharts(category1).then(scatterplot1Data => {
+                // Process data for the second scatterplot category
+                processDataForCharts(category2).then(scatterplot2Data => {
+                    // Combine two dataset arrays
+                    const Scatterplot1 = new Scatterplot('.map1', scatterplot1Data, scatterplot2Data, category1, category2, {
+                        containerWidth: 650,
+                        containerHeight: 650,
+                        margin: {top: 10, right: 10, bottom: 10, left: 10}
+                    });
+                    
+                    document.getElementById('map1-label').textContent = getCategoryLabel(category1);
+                    document.getElementById('map2-label').textContent = getCategoryLabel(category2);
+                });
+            });
+                
+              
               break;
          case 'chloropleth':
             // Clear the parent elements first
@@ -307,6 +333,7 @@ function processDataForCharts(category) {
         switch (vizType) {
             case 'scatterplot':
                 // Call function to render scatterplot
+                updateVisualization(category1, category2, vizType);
                 break;
             case 'chloropleth':
                 // Call updatevizfunction to render chloropleth
