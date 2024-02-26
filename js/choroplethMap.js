@@ -126,7 +126,7 @@ class ChoroplethMap {
       
               // Check if properties and name exist before accessing
               const categoryValue = d.properties && d.properties[vis.category] !== undefined && d.properties[vis.category] !== -1
-                  ? `<strong>${d.properties[vis.category]}</strong>`
+                  ? `${d.properties[vis.category]}`
                   : 'No data available';
       
               const displayName = d.properties && d.properties.display_name ? d.properties.display_name : 'Unknown';
@@ -134,7 +134,7 @@ class ChoroplethMap {
               const tooltipContent = `
                   <div class="tooltip-title">${getCategoryLabel(vis.category)}</div>
                   <div><strong>County:</strong> ${displayName}</div>
-                  <div><strong>${getCategoryLabel(vis.category)}:</strong> ${categoryValue}</div>
+                  <div><strong>${getCategoryLabel(vis.category)}</strong>: ${categoryValue}</div>
               `;
       
               const tooltip = document.getElementById('tooltip');

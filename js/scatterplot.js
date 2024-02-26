@@ -1,4 +1,44 @@
 let category2DataCopy;
+// Function to get the user-friendly label for each category
+function getCategoryLabel(category) {
+    switch (category) {
+        case 'poverty_perc':
+            return 'Poverty Percentage';
+        case 'median_household_income':
+            return 'Median Household Income';
+        case 'education_less_than_high_school_percent':
+            return 'Education Less Than High School Percentage';
+        case 'air_quality':
+            return 'Air Quality';
+        case 'park_access':
+            return 'Park Access';
+        case 'percent_inactive':
+            return 'Percent Inactive';
+        case 'percent_smoking':
+            return 'Percent Smoking';
+        case 'urban_rural_status':
+            return 'Urban/Rural Status';
+        case 'elderly_percentage':
+            return 'Elderly Percentage';
+        case 'number_of_hospitals':
+            return 'Number of Hospitals';
+        case 'number_of_primary_care_physicians':
+            return 'Number of Primary Care Physicians';
+        case 'percent_no_heath_insurance':
+            return 'Percent No Health Insurance';
+        case 'percent_high_blood_pressure':
+            return 'Percent High Blood Pressure';
+        case 'percent_coronary_heart_disease':
+            return 'Percent Coronary Heart Disease';
+        case 'percent_stroke':
+            return 'Percent Stroke';
+        case 'percent_high_cholesterol':
+            return 'Percent High Cholesterol';
+        default:
+            return category; // Use the category name as the label by default
+    }
+  }
+
 class Scatterplot {
     constructor(parentElement, category1Data, category2Data, category1, category2, config) {
         this.parentElement = parentElement;
@@ -32,14 +72,6 @@ class Scatterplot {
     initVis() {
         let vis = this;
         category2DataCopy = this.category2Data;
-        console.log("cat2datacopy:")
-        console.log(category2DataCopy)
-
-        console.log("Category1data:")
-        console.log(this.category1Data)
-        
-        console.log("Category2data:")
-        console.log(this.category2Data)
 
         // Define visualization dimensions
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -86,11 +118,13 @@ class Scatterplot {
              
                 const category2Datum = category2DataCopy.find(item => item.countyName === d.countyName);
 
-                console.log('Category2data:', category2Datum)
+                console.log('Category2data:', category2Datum.categoryData)
                 const tooltipContent = `
-                    <div class="tooltip-title">Tooltip Title</div>
-                    <div>X Data: ${d.categoryData}</div>
-                    <div>Y Data: ${category2Datum.categoryData}</div>
+                    <div class="tooltip-title">${d.countyName}</div>
+                    <div><strong>County Name:</strong>  ${d.countyName}</div>
+                    <div><strong>County FIPS:</strong> ${d.countyFIPS}</div>
+                    <div><strong>${getCategoryLabel(vis.category1)}:</strong> ${d.categoryData}</div>
+                    <div><strong>${getCategoryLabel(vis.category2)}:</strong> ${category2Datum.categoryData}</div>
                 `;
 
                 const tooltip = document.getElementById('tooltip');

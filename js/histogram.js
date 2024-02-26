@@ -222,7 +222,7 @@ class Histogram {
                // Create a scrollable list of counties in the tooltip
                 let countyList = '<div class="scrollable-list">'; // Wrap the list in a container
                 binObjects.forEach(county => {
-                    countyList += `<div>${county.countyName}: ${county.categoryData}</div>`;
+                    countyList += `<div><strong>${county.countyName}:</strong> ${county.categoryData}</div>`;
                 });
                 countyList += '</div>'; // Close the container
 

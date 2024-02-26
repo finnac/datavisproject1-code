@@ -223,9 +223,6 @@ function processDataForCharts(category) {
               document.getElementById('map1').innerHTML = '';
               document.getElementById('map2').innerHTML = '';
 
-              console.log(typeof scatterplot1Data) 
-              console.log(typeof scatterplot2Data)
-
               processDataForCharts(category1).then(scatterplot1Data => {
                 // Process data for the second scatterplot category
                 processDataForCharts(category2).then(scatterplot2Data => {
