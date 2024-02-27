@@ -5,4 +5,5 @@ A user can:
 - select 1 of 3 visualization types (histogricam, chloropleth, and scatterplot)
 - gain data about their visualizations that were generated from the category selections via tooltips
 - NOTE: some categories, such as Urban/Rural status, do not currently work as intended due to time constraints I chose to focus on getting things working dynamically for the MAJORIT of categories.
+- NOTE: no visualizations will be generated upon startup until a category option or visualization type option is changed. 
   
