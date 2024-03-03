@@ -233,7 +233,7 @@ function processDataForCharts(category) {
                         margin: {top: 30, right: 10, bottom: 10, left: 30}
                     });
                     
-                    document.getElementById('map1-label').textContent = "Correlation between " + getCategoryLabel(category1) + "and " + getCategoryLabel(category2);;
+                    document.getElementById('map1-label').textContent = "Correlation between " + getCategoryLabel(category1) + " and " + getCategoryLabel(category2);
                    
                 });
             });
